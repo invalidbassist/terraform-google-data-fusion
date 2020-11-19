@@ -31,13 +31,12 @@ module "vpc" {
   ]
 }
 
-module "peering" {
-  source                     = "terraform-google-modules/network/google//modules/network-peering"
-  prefix                     = "data-fusion-peering"
-  local_network              = module.vpc.network_self_link
-  peer_network               = "projects/${var.tenant_project}/global/networks/${var.region}-${var.instance}"
-  export_local_custom_routes = true
-  export_peer_custom_routes  = true
+resource "google_compute_network_peering" "peering" {
+  name         = "data-fusion-peering"
+  network      = module.vpc.network_self_link
+  peer_network = "projects/${var.tenant_project}/global/networks/${var.region}-${var.instance}"
+  export_custom_routes  = true
+  import_custom_routes  = true
 }
 
 resource "google_compute_global_address" "data_fusion_private_ip_alloc" {
