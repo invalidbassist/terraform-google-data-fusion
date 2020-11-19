@@ -31,8 +31,13 @@ module "vpc" {
   ]
 }
 
+locals {
+  peer_network_name = element(reverse(split("/", "projects/${var.tenant_project}/global/networks/${var.region}-${var.instance}")), 0)
+}
+
+
 resource "google_compute_network_peering" "peering" {
-  name         = "data-fusion-peering"
+  name         = "${module.vpc.network_name}-${local.peer_network_name}"
   network      = module.vpc.network_self_link
   peer_network = "projects/${var.tenant_project}/global/networks/${var.region}-${var.instance}"
   export_custom_routes  = true
